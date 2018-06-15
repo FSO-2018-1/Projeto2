@@ -33,8 +33,6 @@ void lerBackingStore(int numeroPag){
     }
     
     tabelaPag[numeroPag] = primeiroQuadroLivre;
-    
-    enderecoFisico = (tabelaPag[numeroPag] * 256) + deslocamento;
 
     primeiroQuadroLivre++;
 }
@@ -48,6 +46,7 @@ void lerNumPag(int endereco){
         lerBackingStore(numPag);
     }
 
+    enderecoFisico = (tabelaPag[numPag] * 256) + deslocamento;
     valor = memoriaFisica[tabelaPag[numPag]][deslocamento];
 
     printf("----------------------------------------------------------\n");
