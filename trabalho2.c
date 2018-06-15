@@ -4,82 +4,74 @@ Maria Luiza Ferreira - 16/0014433
 Lucas Arthur Lermen - 16/0012961
 */
 
-#include<stdio.h>
-#include<stdlib.h>
-#include<math.h>
-#include <time.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <unistd.h>
-#include <locale.h>
 #include <string.h>
+#include <alloca.h>
 
-int enderecoLogico[10000];
+#define TAM 256
+#define TOTAL_QUADROS 256
+#define TAM_QUADROS 256
 
-#define swap( a, b )   do{ int tmp = a; a = b; b = tmp; }while(0)
+FILE *fileBackingStore;
 
-const char * dec2bin( char * bin, int d ){
-    int i = 0;
-    int j = 0;
+int primeiroQuadroLivre = 0;
+int primeiraTabelaPagLivre = 0;
+signed char disco[TAM];
+int memoriaFisica[TOTAL_QUADROS][TAM_QUADROS];
+int tabelaPag[TAM], deslocamento, numPag;
 
-    for( i = 0; d > 0; d /= 2, i++ )
-        bin[i] = (d % 2) ? '1' : '0';
+void lerBackingStore(int numeroPag){
 
-    for( j = 0; j < (i / 2); j++ )
-        swap( bin[j], bin[ i - j - 1 ] );
+    fseek(fileBackingStore, numeroPag * TAM, SEEK_SET);
+    fread(disco, sizeof(signed char), TAM, fileBackingStore);
 
-    bin[i] = '\0';
+    for(int i = 0; i < TAM; i++){
+        memoriaFisica[primeiroQuadroLivre][i] = disco[i];
+    }
+    
+    tabelaPag[numeroPag] = primeiroQuadroLivre;
 
-    return bin;
+    printf("%d - TABELA DE PAGINAS - %d QUADRO - %d\n",i, numeroPag,tabelaPag[numeroPag]);
+
+    primeiroQuadroLivre++;
 }
 
-void leia_nome(char *nome){
-      int i=0,c=getchar();
-      setbuf(stdin,NULL);
+void lerNumPag(int endereco){
+    // deslocamento = endereco & 0x000000FF;
+    numPag = (endereco & 0x0000FF00) >> 8;
 
-      if(c == '\n'){
-          c = getchar();
-      }
-      do{
-        nome[i]=c;
-        i++;
-        c=getchar();
-      }while(c!='\n');
-      nome[i]='\0';
+    if(tabelaPag[numPag] == -1){
+        lerBackingStore(numPag);
+    }
 }
+
+
+
 
 int main(int argc, char *argv[]){
-    FILE *file;
+    FILE *fileAddress;
     char *endereco;
-    char bin[16];
-    char matriz[10000][16], matrizTeste[10000][16];
+    int enderecoLogico[10000];
     int i,j;
 
     endereco = argv[1];
-    file = fopen(endereco, "r");
-    
-    for( i = 0; !feof(file); i++){
-        fscanf(file, "%d", &enderecoLogico[i]);
+    fileAddress = fopen(endereco, "r");
+    fileBackingStore = fopen("BACKING_STORE.bin", "rb");
+
+    for(i = 0; i < TAM; i++){
+        tabelaPag[i] = -1;
     }
 
-    for( i = 0;i < 10000; i++){
-            strcpy(matriz[i], dec2bin(bin,enderecoLogico[i]));
-            strcpy(matrizTeste[i], matriz[i]);
-            // printf("%d - %s\n",i, matriz[i]);
-    }
-    
-    printf("1 - %s", matriz[9970]>>16);
-
-    for( int i = 0; i < 10000;i++ ){
-        // printf("%d - BINARIO %s\n",i, matrizTeste[i]);
-        // printf("INTEIRO %d\n", enderecoLogico[i]);
+    for( i = 0; !feof(fileAddress); i++){
+        fscanf(fileAddress, "%d", &enderecoLogico[i]);
     }
 
-    // for(i = 0; i < 10000; i++){
-    //     for(j = 0; j < 16; j++){
-    //         printf("%s ",matriz[1][j]);
-    //     }
-    // }
+    for( i = 0; i < 10000; i++){
+        lerNumPag(enderecoLogico[i]);
+    }  
 
-    // printf("BINARIO %s\n INTEIRO %d", dec2bin(bin,enderecoLogico[0]), enderecoLogico[0]);
 
 
 }
