@@ -23,7 +23,7 @@ signed char valor;
 int memoriaFisica[TOTAL_QUADROS][TAM_QUADROS];
 int tabelaPag[TAM], deslocamento, numPag, erroPag = 0, enderecoFisico;
 
-void lerBackingStore(int numeroPag, int endereco, int deslocamento){
+void lerBackingStore(int numeroPag){
 
     fseek(fileBackingStore, numeroPag * TAM, SEEK_SET);
     fread(disco, sizeof(signed char), TAM, fileBackingStore);
@@ -33,16 +33,9 @@ void lerBackingStore(int numeroPag, int endereco, int deslocamento){
     }
     
     tabelaPag[numeroPag] = primeiroQuadroLivre;
-
-    valor = memoriaFisica[tabelaPag[numeroPag]][deslocamento];
     
     enderecoFisico = (tabelaPag[numeroPag] * 256) + deslocamento;
 
-    printf("----------------------------------------------------------\n");
-	printf("|Processo | Quadro | Offset |  Endereco Fisico  | Valor |\n");
-	printf("----------------------------------------------------------\n");
-    printf("|   %d  |    %d   |   %d   |         %d         |   %c  |\n",endereco, tabelaPag[numeroPag], deslocamento, enderecoFisico, valor);
-    printf("\n\n");
     primeiroQuadroLivre++;
 }
 
@@ -52,8 +45,16 @@ void lerNumPag(int endereco){
 
     if(tabelaPag[numPag] == -1){
         erroPag++;
-        lerBackingStore(numPag, endereco, deslocamento);
+        lerBackingStore(numPag);
     }
+
+    valor = memoriaFisica[tabelaPag[numPag]][deslocamento];
+
+    printf("----------------------------------------------------------\n");
+	printf("|Processo | Quadro | Offset |  Endereco Fisico  | Valor |\n");
+	printf("----------------------------------------------------------\n");
+    printf("|   %d  |    %d   |   %d   |         %d         |   %c  |\n",endereco, tabelaPag[numPag], deslocamento, enderecoFisico, valor);
+    printf("\n\n");
 }
 
 int main(int argc, char *argv[]){
