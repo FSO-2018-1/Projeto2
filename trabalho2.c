@@ -31,7 +31,7 @@ void lerBackingStore(int numeroPag){
     for(int i = 0; i < TAM; i++){
         memoriaFisica[primeiroQuadroLivre][i] = disco[i];
     }
-    
+
     tabelaPag[numeroPag] = primeiroQuadroLivre;
 
     primeiroQuadroLivre++;
@@ -50,9 +50,9 @@ void lerNumPag(int endereco){
     valor = memoriaFisica[tabelaPag[numPag]][deslocamento];
 
     printf("----------------------------------------------------------\n");
-	printf("|Processo | Quadro | Offset |  Endereco Fisico  | Valor |\n");
-	printf("----------------------------------------------------------\n");
-    printf("|   %d  |    %d   |   %d   |         %d         |   %c  |\n",endereco, tabelaPag[numPag], deslocamento, enderecoFisico, valor);
+	  printf("| Processo | Quadro | Offset |  Endereco Fisico  | Valor |\n");
+	  printf("----------------------------------------------------------\n");
+    printf("   %d      %d        %d           %d           %c  \n",endereco, tabelaPag[numPag], deslocamento, enderecoFisico, valor);
     printf("\n\n");
 }
 
@@ -78,7 +78,7 @@ int main(int argc, char *argv[]){
 
     for( i = 0; i < numeroEnderecosLidos; i++){
         lerNumPag(enderecoLogico[i]);
-    }  
+    }
 
     taxaErros = erroPag / (double)numeroEnderecosLidos;
 
@@ -87,4 +87,3 @@ int main(int argc, char *argv[]){
     printf("Taxa de erro de pagina: %.3f\n\n", taxaErros);
 
 }
-
