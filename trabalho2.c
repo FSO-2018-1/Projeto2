@@ -13,15 +13,18 @@ Lucas Arthur Lermen - 16/0012961
 #define TAM 256
 #define TOTAL_QUADROS 256
 #define TAM_QUADROS 256
+#define TAM_TLB 16
 
 FILE *fileBackingStore;
 
 int primeiroQuadroLivre = 0;
 int primeiraTabelaPagLivre = 0;
-signed char disco[TAM];
-signed char valor;
+int numEntradaTLB = 0, acertoTLB = 0;
+unsigned char disco[TAM];
+unsigned char valor;
 int memoriaFisica[TOTAL_QUADROS][TAM_QUADROS];
 int tabelaPag[TAM], deslocamento, numPag, erroPag = 0, enderecoFisico;
+int TLB[TAM_TLB][2]; 
 
 void lerBackingStore(int numeroPag){
 
@@ -37,7 +40,54 @@ void lerBackingStore(int numeroPag){
     primeiroQuadroLivre++;
 }
 
+void inserirTLB(int numeroPag){
+     int i, j; 
+    for(i = 0; i < numEntradaTLB; i++){
+        if(TLB[i][0] == numeroPag){
+            tabelaPag[numeroPag] = TLB[i][1];  
+            acertoTLB++;                
+            break;
+        }
+    }
+    
+    if(i == numEntradaTLB){
+        if(numEntradaTLB < TAM_TLB){  
+            TLB[numEntradaTLB][0] = numeroPag;    
+            TLB[numEntradaTLB][1] = tabelaPag[numeroPag];
+        }
+        else{                                            
+            for(i = 0; i < TAM_TLB - 1; i++){
+                TLB[i][1] = TLB[i + 1][0];
+                TLB[i][2] = TLB[i + 1][1];
+            }
+            TLB[numEntradaTLB-1][0] = numeroPag;  
+            TLB[numEntradaTLB-1][1] = tabelaPag[numeroPag];
+        }        
+    }
+    
+    
+    else{
+        for(i = i; i < numEntradaTLB - 1; i++){      
+            TLB[i][1] = TLB[i + 1][0];
+            TLB[i][2] = TLB[i + 1][1];
+        }
+        if(numEntradaTLB < TAM_TLB){                
+            TLB[numEntradaTLB][0] = numeroPag;
+            TLB[numEntradaTLB][1] = tabelaPag[numeroPag];
+        }
+        else{                                       
+            TLB[numEntradaTLB-1][0] = numeroPag;
+            TLB[numEntradaTLB-1][1] = tabelaPag[numeroPag];
+        }
+    }
+    if(numEntradaTLB < TAM_TLB){  
+        numEntradaTLB++;
+    }    
+}
+
 void lerNumPag(int endereco){
+    int i;
+
     deslocamento = endereco & 0x000000FF;
     numPag = (endereco & 0x0000FF00) >> 8;
 
@@ -46,6 +96,7 @@ void lerNumPag(int endereco){
         lerBackingStore(numPag);
     }
 
+    inserirTLB(numPag);
     enderecoFisico = (tabelaPag[numPag] * 256) + deslocamento;
     valor = memoriaFisica[tabelaPag[numPag]][deslocamento];
 
@@ -61,7 +112,7 @@ int main(int argc, char *argv[]){
     char *endereco;
     int enderecoLogico[10000];
     int i,j, numeroEnderecosLidos;
-    double taxaErros;
+    double taxaErros, taxaAcerto;
 
     endereco = argv[1];
     fileAddress = fopen(endereco, "r");
@@ -76,14 +127,18 @@ int main(int argc, char *argv[]){
         numeroEnderecosLidos = i + 1;
     }
 
+
     for( i = 0; i < numeroEnderecosLidos; i++){
         lerNumPag(enderecoLogico[i]);
     }
 
     taxaErros = erroPag / (double)numeroEnderecosLidos;
+    taxaAcerto = acertoTLB / (double)numeroEnderecosLidos;
 
     printf("--------Estatisticas--------\n");
+    printf("Numero de enderecos logicos: %d\n", numeroEnderecosLidos);
     printf("Numero de erros de pagina: %d\n",erroPag);
-    printf("Taxa de erro de pagina: %.3f\n\n", taxaErros);
-
+    printf("Taxa de erro de pagina: %.3f\n", taxaErros);
+    printf("Acerto TLB: %d\n", acertoTLB);
+    printf("Taxa de acerto na TLB: %.3f\n\n", taxaAcerto);
 }
