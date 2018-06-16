@@ -64,22 +64,7 @@ void inserirTLB(int numeroPag){
             TLB[numEntradaTLB-1][1] = tabelaPag[numeroPag];
         }        
     }
-    
-    
-    else{
-        for(i = i; i < numEntradaTLB - 1; i++){      
-            TLB[i][0] = TLB[i + 1][0];
-            TLB[i][1] = TLB[i + 1][1];
-        }
-        if(numEntradaTLB < TAM_TLB){                
-            TLB[numEntradaTLB][0] = numeroPag;
-            TLB[numEntradaTLB][1] = tabelaPag[numeroPag];
-        }
-        else{                                       
-            TLB[numEntradaTLB-1][0] = numeroPag;
-            TLB[numEntradaTLB-1][1] = tabelaPag[numeroPag];
-        }
-    }
+
     if(numEntradaTLB < TAM_TLB){  
         numEntradaTLB++;
     }    
