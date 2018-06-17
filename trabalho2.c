@@ -24,7 +24,7 @@ unsigned char disco[TAM];
 unsigned char valor;
 int memoriaFisica[TOTAL_QUADROS][TAM_QUADROS];
 int tabelaPag[TAM], deslocamento, numPag, erroPag = 0, enderecoFisico;
-int TLB[TAM_TLB][2]; 
+int TLB[TAM_TLB][2];
 
 void lerBackingStore(int numeroPag){
 
@@ -41,33 +41,33 @@ void lerBackingStore(int numeroPag){
 }
 
 void inserirTLB(int numeroPag){
-     int i, j; 
+     int i, j;
     for(i = 0; i < numEntradaTLB; i++){
         if(TLB[i][0] == numeroPag){
-            tabelaPag[numeroPag] = TLB[i][1];  
-            acertoTLB++;                
+            tabelaPag[numeroPag] = TLB[i][1];
+            acertoTLB++;
             break;
         }
     }
-    
+
     if(i == numEntradaTLB){
-        if(numEntradaTLB < TAM_TLB){  
-            TLB[numEntradaTLB][0] = numeroPag;    
+        if(numEntradaTLB < TAM_TLB){
+            TLB[numEntradaTLB][0] = numeroPag;
             TLB[numEntradaTLB][1] = tabelaPag[numeroPag];
         }
-        else{                                            
+        else{
             for(i = 0; i < TAM_TLB - 1; i++){
                 TLB[i][0] = TLB[i + 1][0];
                 TLB[i][1] = TLB[i + 1][1];
             }
-            TLB[numEntradaTLB-1][0] = numeroPag;  
+            TLB[numEntradaTLB-1][0] = numeroPag;
             TLB[numEntradaTLB-1][1] = tabelaPag[numeroPag];
-        }        
+        }
     }
 
-    if(numEntradaTLB < TAM_TLB){  
+    if(numEntradaTLB < TAM_TLB){
         numEntradaTLB++;
-    }    
+    }
 }
 
 void lerNumPag(int endereco){
@@ -123,7 +123,7 @@ int main(int argc, char *argv[]){
     printf("--------Estatisticas--------\n");
     printf("Numero de enderecos logicos: %d\n", numeroEnderecosLidos);
     printf("Numero de erros de pagina: %d\n",erroPag);
-    printf("Taxa de erro de pagina: %.3f\n", taxaErros);
+    printf("Taxa de erro de pagina (em porcentagem): %.2f\n", taxaErros*100);
     printf("Acerto TLB: %d\n", acertoTLB);
-    printf("Taxa de acerto na TLB: %.3f\n\n", taxaAcerto);
+    printf("Taxa de acerto na TLB (em porcentagem): %.2f\n\n", taxaAcerto*100);
 }
